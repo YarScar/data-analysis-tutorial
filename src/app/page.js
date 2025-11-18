@@ -6,6 +6,7 @@ import QualityScore from '../components/QualityScore'
 import DataVisualizations from '../components/DataVisualizations'
 import AIInsights from '../components/AIInsights'
 import ReportDownload from '../components/ReportDownload'
+import QualitySummary from '../components/QualitySummary'
 import { useState } from 'react'
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
           <QualityScore data={dataset} onAnalyze={setAnalysis} />
           {analysis && (
             <>
+              <QualitySummary analysis={analysis} />
               <DataVisualizations analysis={analysis} />
               <AIInsights analysis={analysis} data={dataset} />
             </>
