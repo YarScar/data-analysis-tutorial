@@ -1,0 +1,28 @@
+{
+  "name": "agentic-data-quality-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .js,.jsx",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "next": "14",
+    "react": "18",
+    "react-dom": "18",
+    "papaparse": "^5.4.1",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "openai": "^4.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.0",
+    "@testing-library/react": "^14.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0"
+  }
+}

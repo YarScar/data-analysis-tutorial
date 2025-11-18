@@ -1,0 +1,22 @@
+/* Minimal global styles */
+html,body,#root{height:100%}
+body{font-family:system-ui,Arial,sans-serif;margin:0;color:#111}
+table{border-collapse:collapse}
+th,td{padding:6px 8px;border:1px solid #e6e6e6}
+.container{max-width:1100px;margin:0 auto}
+
+/* Accessibility and focus styles */
+:focus{outline: 3px solid #ffbf47; outline-offset: 2px}
+button{background:#004085;color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer}
+button[type="button"]{background:#004085}
+button[disabled]{opacity:0.6;cursor:not-allowed}
+
+/* Skip link */
+.skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
+.skip-link:focus{position:static;left:auto;width:auto;height:auto;margin:8px}
+
+/* Responsive table container */
+@media (max-width:640px){
+	.container{padding:0 12px}
+	table{font-size:12px}
+}
