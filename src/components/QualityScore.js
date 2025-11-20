@@ -7,8 +7,8 @@ export default function QualityScore({ data, onAnalyze }) {
   }
 
   return (
-    <div style={{marginTop: '1rem'}}>
-      <button type="button" aria-label="Analyze data quality" onClick={handleAnalyze}>Analyze Data Quality</button>
+    <div className="mt-2" style={{textAlign: 'center'}}>
+      <button type="button" className="btn" aria-label="Analyze data quality" onClick={handleAnalyze} style={{fontSize: '1rem', padding: '12px 28px'}}>✨ Analyze Data Quality</button>
     </div>
   )
 }

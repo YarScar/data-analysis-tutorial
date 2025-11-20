@@ -181,3 +181,33 @@ MIT License - Educational use encouraged
 **Generated:** 2025-11-15
 **Generator Version:** 1.0.0
 
+## Milestone 3 — AI Insights & Interactive Charts
+
+How to verify locally:
+
+- Ensure your OpenAI API key is stored in a local, untracked file: `.env.local` (this repo's `.gitignore` already includes it).
+- Start the dev server:
+
+```bash
+npm install
+npm run dev
+```
+
+- In another terminal run the smoke test to validate the AI endpoint:
+
+```bash
+npm run smoke-test
+```
+
+- Manual UI checks:
+    - Upload a CSV/JSON/XLSX sample and run the analysis.
+    - Confirm `AI Insights` shows a loading state and then a parsed summary + recommendations.
+    - Click bars in the missingness chart to select a column and request per-column AI recommendations.
+    - Verify server-generated report downloads work (JSON/CSV).
+
+Logging and troubleshooting:
+
+- The server now logs model parse/validation failures to `logs/ai.log` (server-side only). If you see unexpected model output or parsing retries, check that file for details to help tune the prompt.
+
+If everything above works, Milestone 3 is functionally complete: interactive visualizations, column-level AI recommendations, and robust server-side validation/retry are in place.
+

@@ -1,5 +1,10 @@
+"use client"
+import { useRouter } from 'next/navigation'
+
 export default function ColumnDetails({ analysis, selectedColumn, onSelectColumn, onRequestAI }) {
   if (!analysis || !analysis.columnStats) return null
+
+  const router = useRouter()
 
   const cols = Object.keys(analysis.columnStats)
 
@@ -33,7 +38,13 @@ export default function ColumnDetails({ analysis, selectedColumn, onSelectColumn
                   <td>{out}</td>
                   <td>
                     <button type="button" onClick={() => onSelectColumn && onSelectColumn(c)}>View</button>
-                    <button type="button" onClick={() => onRequestAI && onRequestAI(c)} style={{marginLeft:8}}>Ask AI</button>
+                      <button type="button" onClick={() => {
+                        try {
+                          sessionStorage.setItem('selectedColumn', c)
+                        } catch (e) { console.error(e) }
+                        if (onRequestAI) onRequestAI(c)
+                        else router.push('/insights')
+                      }} style={{marginLeft:8}}>Ask AI</button>
                   </td>
                 </tr>
               )

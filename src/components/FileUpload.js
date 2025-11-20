@@ -54,8 +54,28 @@ export default function FileUpload({ onData }) {
 
   return (
     <div>
-      <label htmlFor="file-input" style={{display:'block', marginBottom:8}}>Upload CSV, JSON or Excel (.xls/.xlsx)</label>
-      <input id="file-input" aria-label="Upload data file" ref={fileRef} type="file" accept=".csv,.json,.xls,.xlsx" onChange={handleFile} />
+      <label htmlFor="file-input" style={{display:'block', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: 600, color: 'var(--light-mocha)'}}>📤 Upload Your Data</label>
+      <div style={{position: 'relative'}}>
+        <input 
+          id="file-input" 
+          aria-label="Upload data file" 
+          ref={fileRef} 
+          type="file" 
+          accept=".csv,.json,.xls,.xlsx"
+          onChange={handleFile}
+          style={{
+            padding: '12px',
+            border: '2px dashed rgba(214,167,122,0.4)',
+            borderRadius: '8px',
+            background: 'rgba(255,255,255,0.4)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+      <p style={{marginTop: '0.8rem', fontSize: '0.9rem', color: 'var(--warm-taupe)', margin: '0.8rem 0 0 0'}}>CSV • JSON • Excel supported</p>
     </div>
   )
 }
