@@ -29,3 +29,17 @@ export function simpleTypeConsistency(data) {
   })
   return result
 }
+
+export function detectOutliersIQR(data, column) {
+  // return indices or count of outliers using IQR method for numeric columns
+  const vals = data.map((r) => r[column]).filter((v) => v !== null && v !== undefined && v !== '')
+  const nums = vals.map(Number).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b)
+  if (nums.length < 4) return { count: 0, outliers: [] }
+  const q1 = nums[Math.floor((nums.length / 4))]
+  const q3 = nums[Math.floor((nums.length * 3) / 4)]
+  const iqr = q3 - q1
+  const lower = q1 - 1.5 * iqr
+  const upper = q3 + 1.5 * iqr
+  const outliers = nums.filter((n) => n < lower || n > upper)
+  return { count: outliers.length, outliers }
+}

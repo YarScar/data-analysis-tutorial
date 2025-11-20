@@ -1,4 +1,5 @@
-import { missingnessByColumn, duplicateRowCount, simpleTypeConsistency } from './qualityMetrics'
+import { missingnessByColumn, duplicateRowCount, simpleTypeConsistency, detectOutliersIQR } from './qualityMetrics'
+import { inferColumnStats } from './typeInference'
 
 export function analyzeDataQuality(data) {
   if (!data || data.length === 0) return null
@@ -6,6 +7,16 @@ export function analyzeDataQuality(data) {
   const missingness = missingnessByColumn(data)
   const duplicates = duplicateRowCount(data)
   const typeConsistency = simpleTypeConsistency(data)
+
+  const columnStats = inferColumnStats(data)
+
+  // detect outliers per numeric column
+  const outliers = {}
+  Object.keys(columnStats).forEach((col) => {
+    if (columnStats[col].type === 'number') {
+      outliers[col] = detectOutliersIQR(data, col)
+    }
+  })
 
   // simple overall score: 100 - avg missing% - duplicates penalty
   const avgMissing = Object.values(missingness).reduce((a,b)=>a+b,0) / Object.values(missingness).length
@@ -17,6 +28,8 @@ export function analyzeDataQuality(data) {
     missingness,
     duplicates,
     typeConsistency,
+    columnStats,
+    outliers,
     rowCount: data.length,
     columnCount: Object.keys(data[0] || {}).length
   }
