@@ -1,4 +1,5 @@
 import { analyzeDataQuality } from '../lib/dataAnalysis'
+import '../styles/QualityScore.css'
 
 export default function QualityScore({ data, onAnalyze }) {
   function handleAnalyze() {

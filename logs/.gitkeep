@@ -1,0 +1,1 @@
+# Keep the logs directory in Git so users see it; actual logs will be written at runtime to logs/ai.log

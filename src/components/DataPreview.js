@@ -1,3 +1,5 @@
+import '../styles/DataPreview.css'
+
 export default function DataPreview({ data = [] }) {
   if (!data || data.length === 0) return <div>No data to preview</div>
 

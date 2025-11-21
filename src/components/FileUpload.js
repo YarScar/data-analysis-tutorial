@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import '../styles/FileUpload.css'
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
 import { normalizeRow } from '../lib/fileProcessing'

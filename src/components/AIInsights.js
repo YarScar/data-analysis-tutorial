@@ -1,46 +1,84 @@
-import { useEffect, useState } from 'react'
+﻿import '../styles/AIInsights.css'
 
-export default function AIInsights({ insights }) {
-  if (!insights) return null
+export default function AIInsights({ insights, column = null, analysis = null }) {
 
-  // insights may contain { error } or { text, parsed }
-  if (insights.error) {
-    return <div style={{marginTop:16}}><h3>AI Insights</h3><p>Error: {insights.error}</p></div>
+  if (insights?.error) {
+    return (
+      <div style={{ marginTop: 16 }}>
+        <h3>AI Insights</h3>
+        <p>Error: {insights.error}</p>
+      </div>
+    )
   }
 
-  if (insights.loading) {
-    return <div style={{marginTop:16}}><h3>AI Insights</h3><p>Loading AI insights…</p></div>
+  if (insights?.loading) {
+    return (
+      <div style={{ marginTop: 16 }}>
+        <h3>AI Insights</h3>
+        <p>Loading AI insights…</p>
+      </div>
+    )
   }
 
-  const { parsed, text } = insights
+  const parsed = insights?.normalized ?? insights?.parsed ?? null
+  const rawText = insights?.text ?? null
+
+  let issuesCount = 0
+  try {
+    if (parsed && Array.isArray(parsed.recommendations)) issuesCount += parsed.recommendations.length
+    if (column && (column.missingCount || column.missingPercent)) {
+      const miss = column.missingCount || 0
+      if (miss > 0 || (column.missingPercent && column.missingPercent > 0)) issuesCount += 1
+    }
+    if (analysis && analysis.outliers && column && analysis.outliers[column.column] && analysis.outliers[column.column].count > 0) issuesCount += 1
+  } catch (e) {
+    // ignore
+  }
 
   return (
-    <div style={{marginTop: 16}} aria-live="polite">
-      <h3>AI Insights</h3>
-      <div role="region" aria-label="AI insights">
-        {parsed ? (
-          <div>
-            <p><strong>Summary:</strong> {parsed.summary}</p>
-            {parsed.recommendations && (
+    <section style={{ marginTop: 16 }} aria-live="polite">
+      <h3>Detailed Insights {column ? '- ' + column.column : ''}</h3>
+      <div style={{ fontSize: 14, marginTop: 8 }}>
+        <div><strong>Issues:</strong> {issuesCount}</div>
+        <div style={{ marginTop: 12 }}>
+          <strong>Analysis Details</strong>
+          <div style={{ marginTop: 6 }}>
+            {column ? (
               <div>
-                <strong>Recommendations:</strong>
-                <ul>
-                  {parsed.recommendations.map((r, i) => (
-                    <li key={i}>
-                      {typeof r === 'string' ? r : (
-                        <span>{r.step} <em style={{color:'#666'}}>({r.severity})</em></span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                <div>Type: {column.type ?? 'unknown'}</div>
+                <div>Missing: {column.missingCount ?? 0} ({String(column.missingPercent ?? 0)}%)</div>
+                <div>Unique: {column.uniqueCount ?? '—'}</div>
               </div>
+            ) : (
+              <div>No column analysis available.</div>
             )}
-            {parsed.notes && <p><strong>Notes:</strong> {parsed.notes}</p>}
           </div>
-        ) : (
-          <pre style={{whiteSpace:'pre-wrap'}}>{text}</pre>
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <strong>Suggested Fixes</strong>
+          <div style={{ marginTop: 6 }}>
+            {parsed && Array.isArray(parsed.recommendations) ? (
+              <ol>
+                {parsed.recommendations.map((r, i) => (
+                  <li key={i}>{typeof r === 'string' ? r : r.step} ({(r && r.severity) || 'medium'})</li>
+                ))}
+              </ol>
+            ) : rawText ? (
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{rawText}</pre>
+            ) : (
+              <div>No recommendations returned by the AI.</div>
+            )}
+          </div>
+        </div>
+
+        {parsed && parsed.notes && (
+          <div style={{ marginTop: 12 }}>
+            <strong>Notes:</strong>
+            <div>{parsed.notes}</div>
+          </div>
         )}
       </div>
-    </div>
+    </section>
   )
 }

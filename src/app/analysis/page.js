@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import QualitySummary from '../../components/QualitySummary'
 import DataVisualizations from '../../components/DataVisualizations'
 import ColumnDetails from '../../components/ColumnDetails'
-import AIInsights from '../../components/AIInsights'
+import AIInsights from '../../components/AIInsightsFixed'
 
 export default function AnalysisPage() {
   const [analysis, setAnalysis] = useState(null)
