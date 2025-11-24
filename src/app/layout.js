@@ -1,7 +1,7 @@
 // Root layout for the Next.js app
 // This file defines the HTML shell used across all pages under `src/app`.
 // It includes site metadata, global styles, navigation and a content slot (`children`).
-import './globals.css'
+import '../styles/globals.css'
 import Link from 'next/link'
 
 // Metadata used by Next.js for the site (title and description)
