@@ -1,4 +1,7 @@
 "use client"
+// Analysis page (client component)
+// - Reads a saved `analysis` object from sessionStorage
+// - Renders the overall quality score, metrics, visualizations and AI insights
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import QualitySummary from '../../components/QualitySummary'
@@ -7,17 +10,21 @@ import ColumnDetails from '../../components/ColumnDetails'
 import AIInsights from '../../components/AIInsightsFixed'
 
 export default function AnalysisPage() {
+  // analysis: the full analysis object created on the Preview page
   const [analysis, setAnalysis] = useState(null)
+  // selectedColumn allows users to drill into a single column
   const [selectedColumn, setSelectedColumn] = useState(null)
   const router = useRouter()
 
   useEffect(() => {
+    // Load analysis from sessionStorage on mount (if present)
     try {
       const raw = sessionStorage.getItem('analysis')
       if (raw) setAnalysis(JSON.parse(raw))
     } catch (e) { console.error(e) }
   }, [])
 
+  // If no analysis exists, show a friendly message and link back to Preview
   if (!analysis) return (
     <div className="card" style={{maxWidth: '600px', margin: '2rem auto', textAlign: 'center'}}>
       <h2>📊 Analysis Dashboard</h2>
@@ -28,12 +35,12 @@ export default function AnalysisPage() {
 
   return (
     <div>
-      {/* Header */}
+      {/* Page header */}
       <h1 style={{marginBottom: '2rem', color: 'var(--light-mocha)'}}>📊 Analysis Results Dashboard</h1>
 
-      {/* Top Row: Quality Score + Summary */}
+      {/* Top row with the numeric quality score and a summary of metrics */}
       <div style={{display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.5rem', marginBottom: '2rem'}}>
-        {/* Quality Score Card - Large */}
+        {/* Quality Score Card - visual emphasis */}
         <div className="card" style={{
           background: 'linear-gradient(135deg, var(--blush-pink), var(--soft-coral))',
           padding: '2rem',
@@ -53,7 +60,7 @@ export default function AnalysisPage() {
           </div>
         </div>
 
-        {/* Quality Metrics Summary */}
+        {/* Quality Metrics Summary - quick glance metrics */}
         <div className="card" style={{padding: '1.5rem'}}>
           <h3 style={{color: 'var(--light-mocha)', marginTop: 0}}>Quality Metrics</h3>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
@@ -101,7 +108,7 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      {/* Data Visualizations Section */}
+      {/* Data Visualizations Section - charts and small summaries */}
       <div className="card" style={{marginBottom: '2rem', padding: '1.5rem'}}>
         <h2 style={{color: 'var(--light-mocha)', marginTop: 0, marginBottom: '1.5rem'}}>Data Visualizations</h2>
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem'}}>
@@ -130,7 +137,7 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      {/* AI Insights Section */}
+      {/* AI Insights Section - uses AI component to provide suggestions */}
       <div className="card" style={{
         marginBottom: '2rem',
         padding: '1.5rem',

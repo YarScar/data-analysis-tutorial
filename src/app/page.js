@@ -1,26 +1,34 @@
 "use client"
+// Home page (client component)
+// - Shows a file upload control
+// - Persists the uploaded dataset into sessionStorage
+// - Tracks a small list of recent analyses in localStorage
 import FileUpload from '../components/FileUpload'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
 export default function Home() {
   const router = useRouter()
+  // recentAnalyses is a small local cache shown on the homepage
   const [recentAnalyses, setRecentAnalyses] = React.useState([])
 
   React.useEffect(() => {
-    // Load recent analyses from localStorage
+    // Load recent analyses from localStorage when the page mounts
     try {
       const stored = localStorage.getItem('recentAnalyses')
       if (stored) setRecentAnalyses(JSON.parse(stored))
     } catch (e) { console.error(e) }
   }, [])
 
+  // Called when FileUpload component returns parsed data
   function handleData(data) {
     try {
+      // Keep the dataset in session storage so other pages can access it
       sessionStorage.setItem('dataset', JSON.stringify(data))
+      // Clear any previous analysis when a new dataset is uploaded
       sessionStorage.removeItem('analysis')
       
-      // Save to recent analyses
+      // Add a small recent-analyses entry to localStorage (for UI history)
       const recent = {
         id: Date.now(),
         name: 'New Analysis',
@@ -31,6 +39,7 @@ export default function Home() {
       localStorage.setItem('recentAnalyses', JSON.stringify(updated))
       setRecentAnalyses(updated)
       
+      // Navigate to preview page where user can inspect data before analysis
       router.push('/preview')
     } catch (e) {
       console.error('Failed to save dataset to sessionStorage', e)
@@ -46,7 +55,7 @@ export default function Home() {
           <p style={{fontSize: '1.1rem', color: 'var(--warm-taupe)', margin: '0'}}>Instant AI-Powered Quality Insights</p>
         </div>
 
-        {/* Upload Card */}
+        {/* Upload Card - FileUpload calls `onData` when file parsing completes */}
         <div className="card" style={{maxWidth: '600px', margin: '0 auto 2rem', padding: '2.5rem', textAlign: 'center'}}>
           <FileUpload onData={handleData} />
           <div style={{marginTop: '1rem', fontSize: '0.9rem', color: 'var(--warm-taupe)'}}>
@@ -55,7 +64,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recent Analyses Section */}
+      {/* Recent Analyses Section - shows local history if present */}
       {recentAnalyses.length > 0 && (
         <section style={{marginTop: '2rem', maxWidth: '700px', margin: '2rem auto'}}>
           <h2 style={{color: 'var(--light-mocha)', marginBottom: '1rem'}}>Recent Analyses</h2>

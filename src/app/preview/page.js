@@ -1,4 +1,7 @@
 "use client"
+// Preview page (client component)
+// - Loads the uploaded dataset from sessionStorage
+// - Lets user inspect sample rows, column stats and start a simulated analysis
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DataPreview from '../../components/DataPreview'
@@ -6,19 +9,23 @@ import QualityScore from '../../components/QualityScore'
 import { analyzeDataQuality } from '../../lib/dataAnalysis'
 
 export default function PreviewPage() {
+  // dataset: the array of parsed rows (objects)
   const [dataset, setDataset] = useState(null)
+  // UI state for fake analysis progress
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [analysisStatus, setAnalysisStatus] = useState('')
   const router = useRouter()
 
   useEffect(() => {
+    // Load the dataset saved on the Home page
     try {
       const raw = sessionStorage.getItem('dataset')
       if (raw) setDataset(JSON.parse(raw))
     } catch (e) { console.error(e) }
   }, [])
 
+  // Persist analysis and navigate to the Analysis page
   function handleAnalyze(analysis) {
     try {
       sessionStorage.setItem('analysis', JSON.stringify(analysis))
@@ -26,7 +33,7 @@ export default function PreviewPage() {
     } catch (e) { console.error(e) }
   }
 
-  // Simulate analysis with progress
+  // Simulate analysis with a visible progress bar, then run the real analysis
   async function simulateAnalysis() {
     if (!dataset) return
     
@@ -52,10 +59,12 @@ export default function PreviewPage() {
     setAnalysisStatus('Analysis complete!')
     await new Promise(resolve => setTimeout(resolve, 300))
     
+    // Run the real (synchronous) data analysis helper and navigate
     const analysis = analyzeDataQuality(dataset)
     handleAnalyze(analysis)
   }
 
+  // If no dataset is present, show instructions to upload from Home
   if (!dataset) return (
     <div>
       <section className="card" style={{maxWidth: '600px', margin: '2rem auto', textAlign: 'center'}}>
@@ -124,12 +133,7 @@ export default function PreviewPage() {
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
+          <style>{`\n            @keyframes spin {\n              0% { transform: rotate(0deg); }\n              100% { transform: rotate(360deg); }\n            }\n          `}</style>
         </div>
       </div>
     )

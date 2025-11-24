@@ -1,16 +1,23 @@
 "use client"
+// Insights page (client component)
+// - Shows detailed insights for a single selected column
+// - Fetches AI insights from `/api/ai` when needed and caches in the analysis object
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ColumnChart from '../../components/ColumnChart'
 import AIInsights from '../../components/AIInsightsFixed'
 
 export default function InsightsPage() {
+  // analysis: the full analysis saved in sessionStorage
   const [analysis, setAnalysis] = useState(null)
+  // selected: name of the currently selected column
   const [selected, setSelected] = useState(null)
+  // columnAIState: local loading/error state while fetching AI results
   const [columnAIState, setColumnAIState] = useState(null)
   const router = useRouter()
 
   useEffect(() => {
+    // Load analysis from sessionStorage when the component mounts
     try {
       const raw = sessionStorage.getItem('analysis')
       if (raw) setAnalysis(JSON.parse(raw))
@@ -18,13 +25,15 @@ export default function InsightsPage() {
   }, [])
 
   useEffect(() => {
+    // Try to read a selected column name persisted earlier (optional)
     try {
       const rawSel = sessionStorage.getItem('selectedColumn')
       if (rawSel) setSelected(rawSel)
     } catch (e) { console.error(e) }
   }, [])
 
-  // When selected column and analysis are present, fetch AI insights if not cached
+  // When a column is selected, ensure we have AI insights for it.
+  // If AI results are already attached to `analysis.columnAI`, reuse them.
   useEffect(() => {
     async function fetchAI() {
       if (!analysis || !selected) return
@@ -35,9 +44,10 @@ export default function InsightsPage() {
         return
       }
 
+      // Mark loading while we call the API
       setColumnAIState({ loading: true })
 
-      // Build a small sample from sessionStorage dataset if available
+      // Build a small sample from the stored dataset (used by the AI endpoint)
       let sample = []
       try {
         const raw = sessionStorage.getItem('dataset')
@@ -48,6 +58,7 @@ export default function InsightsPage() {
       } catch (e) { sample = [] }
 
       try {
+        // Request AI analysis for the selected column
         const res = await fetch('/api/ai', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -56,7 +67,7 @@ export default function InsightsPage() {
         const json = await res.json()
         const aiResult = json.normalized || json.parsed || { text: json.text }
 
-        // attach to analysis and persist to sessionStorage
+        // attach AI result to the analysis object and persist it
         const updated = { ...(analysis || {}), columnAI: { ...(analysis.columnAI || {}), [selected]: aiResult } }
         setAnalysis(updated)
         try { sessionStorage.setItem('analysis', JSON.stringify(updated)) } catch (e) { console.error(e) }
@@ -71,6 +82,7 @@ export default function InsightsPage() {
     fetchAI()
   }, [analysis, selected])
 
+  // If no analysis is available, prompt the user to run it from Preview
   if (!analysis) return (
     <div className="card" style={{maxWidth: '600px', margin: '2rem auto', textAlign: 'center'}}>
       <h2>💡 Detailed Insights</h2>
@@ -79,15 +91,17 @@ export default function InsightsPage() {
     </div>
   )
 
-  // safe access: analysis uses `columnStats` for per-column summaries
+  // Read the raw dataset if available (safe-guard for SSR)
   const datasetRaw = typeof window !== 'undefined' ? sessionStorage.getItem('dataset') : null
   let dataset = null
   try { dataset = datasetRaw ? JSON.parse(datasetRaw) : null } catch (e) { dataset = null }
 
+  // Prepare column-related variables for rendering
   const columnName = selected
   const columnStats = analysis && analysis.columnStats ? analysis.columnStats : null
   const column = columnName && columnStats ? { name: columnName, ...columnStats[columnName] } : null
   const columnAI = analysis && analysis.columnAI ? analysis.columnAI[columnName] : null
+  // effectiveAI will be either cached AI or the in-progress state
   const effectiveAI = columnAI || columnAIState
   return (
     <div>
@@ -99,6 +113,7 @@ export default function InsightsPage() {
             <ColumnChart column={columnName} stats={columnStats} data={dataset || []} selectedColumn={columnName} />
           </div>
           <div className="card">
+            {/* AIInsights displays either loading state or the AI text/summaries */}
             <AIInsights insights={effectiveAI || { loading: true }} column={column} analysis={analysis} />
           </div>
         </div>
